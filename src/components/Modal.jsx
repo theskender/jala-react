@@ -1,26 +1,24 @@
 import React, {useEffect} from 'react';
 
-const Modal = ({ open, setOpen, children }) => {
+const Modal = ({ isOpen, closeModal, children }) => {
 
   useEffect(
     () => {
       const onKeyup = (e) => {
         if (e.key === 'Escape') {
-          setOpen(false);
+            closeModal();
         }
       };
 
       document.addEventListener('keyup', onKeyup);
       return () => { document.removeEventListener('keyup', onKeyup); }
     },
-    [setOpen]
+    [closeModal]
   )
-
-  const closeModal = () => setOpen(false)
 
   return (
     <>
-      {open && (
+      {isOpen && (
         <>
           <div className="overlay" onClick={closeModal} />
           <div className="modal">

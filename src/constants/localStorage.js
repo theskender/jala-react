@@ -17,3 +17,8 @@ export const initLabelData = {
   labelName: '',
   color: '#FF0000',
 }
+
+export const LOCAL_STORAGE_PROJECTS_DATA = 'projects';
+
+
+export const LOCAL_STORAGE_DAYS_DATA = 'days';

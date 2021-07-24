@@ -1,29 +1,21 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   initLabelData,
-  initUserData,
   LOCAL_STORAGE_SERVICE_DATA,
-  LOCAL_STORAGE_USER_DATA
 } from "../constants/localStorage";
-import Modal from "./modal";
+import Modal from "./Modal";
 
-const loadData = () => {
-  const userData = localStorage.getItem(LOCAL_STORAGE_USER_DATA);
-  if (userData) {
-    const a = Object.assign({}, initUserData, JSON.parse(userData));
-    console.log(a);
-    return a;
-  }
-  return initUserData;
-}
-
-const Header = () => {
+const Header = ({ userData, setUserData, reset }) => {
   const [open, setOpen] = useState(false);
   const toggleModal = () => setOpen(open => !open);
 
-  const [form, setForm] = useState(() => loadData());
+  const [form, setForm] = useState(userData);
+  useEffect(
+    () => { setForm(userData); },
+    [userData]
+  );
+
   const [labelForm, setLabelForm] = useState(initLabelData);
-  const [userData, setUserData] = useState(() => loadData());
 
   const onChange = (e) => {
     const {name, value} = e.target;
@@ -35,7 +27,6 @@ const Header = () => {
 
   const onChangeLabel = (e) => {
     const {name, value} = e.target;
-    console.log({ name, value })
     setLabelForm({
       ...labelForm,
       [name]: value,
@@ -71,20 +62,16 @@ const Header = () => {
   }
 
   const onSubmit = () => {
-    localStorage.setItem(LOCAL_STORAGE_USER_DATA, JSON.stringify(form));
     setUserData(form);
     setOpen(false);
   }
 
-  const onError = () => {
-    setUserData({
-      ...userData,
-      profilePicUrl: 'JALA-Logo-NO-TEXT b&w.svg',
-    })
-  }
-
-  const reset = () => {
-    localStorage.setItem(LOCAL_STORAGE_USER_DATA, JSON.stringify(initUserData));
+  const onReset = () => {
+    if (window.confirm('Jeste li sigurni?')) {
+      reset();
+      window.alert('Baza očišćena!');
+      setOpen(false);
+    }
   }
 
   return (
@@ -99,14 +86,13 @@ const Header = () => {
           <img
             onClick={toggleModal}
             className="header-user-pic clickable"
-            src={userData.profilePicUrl}
-            onError={onError}
+            src={userData.profilePicUrl || 'JALA-Logo-NO-TEXT b&w.svg'}
             alt=""
           />
         </div>
       </header>
       {/*admin modal*/}
-      <Modal open={open} setOpen={setOpen}>
+      <Modal isOpen={open} closeModal={() => setOpen(false)}>
         <div>
           <div className="modal__header">
             <div className="modal__header-title">Administracija</div>
@@ -237,7 +223,7 @@ const Header = () => {
                   </p>
                 </div>
                 <div className="form-btn-container">
-                  <button className="form-btn" type="button" onClick={reset}>
+                  <button className="form-btn" type="button" onClick={onReset}>
                     Izbriši sve
                   </button>
                 </div>
